@@ -10,6 +10,6 @@
     - WebSocket
     - Spring data JPA
     - MySQL Driver
-    - thymleaf
+    - thymeleaf
     - lombok
     - Junit5
