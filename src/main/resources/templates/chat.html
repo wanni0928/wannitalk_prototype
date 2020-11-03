@@ -1,105 +1,59 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <meta charset="UTF-8">
-    <title>Chating</title>
-    <link rel="stylesheet" href="/css/style.css"/>
-</head>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>채팅 서비스</title>
+    </head>
+    <body>
+        <input type="text" id="nickName" class="form-inline" placeholder="닉네임을 입력해주세요" required autofocus>
+        <button class = "btn btn-primary" id = "name">확인</button>
 
-<script type="text/javascript">
-	let ws;
+        <div id = "chatroom" style = "width:400px; height: 600px; border:1px solid; background-color : gray"></div>
+        <input type = "text" id = "message" style = "height : 30px; width : 340px" placeholder="내용을 입력하세요" autofocus>
+        <button class = "btn btn-primary" id = "send">전송</button>
+    </body>
+    <script>
+        let webSocket;
+        let nickName;
+        
+        const onClose = () => {};
 
-    function wsOpen(){
-        ws = new WebSocket("ws://" + location.host + "/chatting/" + $("#roomNumber").val());
-        wsEvt();
-    }
+        const onMessage = (e) => {
+            let data = e.data;
+            let chatroom = document.getElementById("chatroom");
+            chatroom.innerHTML = chatroom.innerHTML + "<br>" + data;
+        };
 
-    function wsEvt() {
-            ws.onopen = function(data){
-                //소켓이 열리면 동작
-            }
+        const onOpen = () => {
+            webSocket.send(nickName + "님이 입장하셨습니다.");
+        };
 
-            ws.onmessage = function(data) {
-                //메시지를 받으면 동작
-                var msg = data.data;
-                if(msg != null && msg.trim() != ''){
-                    var d = JSON.parse(msg);
-                    if(d.type == "getId"){
-                        var si = d.sessionId != null ? d.sessionId : "";
-                        if(si != ''){
-                            $("#sessionId").val(si);
-                        }
-                    }else if(d.type == "message"){
-                        if(d.sessionId == $("#sessionId").val()){
-                            $("#chating").append("<p class='me'>나 :" + d.msg + "</p>");
-                        }else{
-                            $("#chating").append("<p class='others'>" + d.userName + " :" + d.msg + "</p>");
-                        }
+        const send = () => {
+           let msg = document.getElementById("message").value;
+           webSocket.send(nickName + " : " + msg);
+           document.getElementById("message").value = "";
+        };
 
-                    }else{
-                        console.warn("unknown type!")
-                    }
-                }
-            }
-
-            document.addEventListener("keypress", function(e){
-                if(e.keyCode == 13){ //enter press
-                    send();
-                }
-            });
+        const disconnect = () => {
+            webSocket.send(nickName + "님이 퇴장하셨습니다.");
+            webSocket.close()
         }
 
+        const connect = () => {
+            webSocket = new WebSocket("ws://" + location.host + "/chat");
+            webSocket.onopen = onOpen;
+            webSocket.onclose = onClose;
+            webSocket.onmessage = onMessage;
+        };
 
-    function chatName(){
-        var userName = $("#userName").val();
-        if(userName == null || userName.trim() == ""){
-            alert("사용자 이름을 입력해주세요.");
-            document.getElementById("userName").focus();
-            // $("#userName").focus();
-        }else{
-            wsOpen();
-            $("#yourName").hide();
-            $("#yourMsg").show();
-        }
-    }
+        document.getElementById("name").addEventListener("click", ()=>{
+            nickName = document.getElementById("nickName").value;
+            document.getElementById("nickName").style.display="none";
+            document.getElementById("name").style.display="none";
+            connect();
+        });
+        
+        document.getElementById("send").addEventListener("click", ()=>{send()});
 
-    function send() {
-		let option = {
-			type: "message",
-			roomNumber: $("#roomNumber").val(),
-			sessionId : $("#sessionId").val(),
-			userName : $("#userName").val(),
-			msg : $("#chatting").val()
-		}
-		ws.send(JSON.stringify(option))
-		$('#chatting').val("");
-	}
-
-</script>
-<body>
-<div id="container" class="container">
-    <h1 th:value="${roomName}">${roomName}의 채팅</h1>
-	<input type="hidden" id="sessionId" value="">
-	<input type="hidden" id="roomNumber" th:value="${roomNumber}">
-
-    <div id="chating" class="chating">
-    </div>
-
-    <div id="yourName">
-		<label for="userName" class="inputTable">
-			사용자명
-		</label>
-		<input type="text" name="userName" id="userName">
-		<button onclick="chatName()" id="startBtn">이름 등록</button>
-    </div>
-    <div id="yourMsg">chating
-		<label for="chatting" class="inputTable">
-			메시지
-		</label>
-		<input id="chatting" placeholder="보내실 메시지를 입력하세요.">
-		<button onclick="send()" id="sendBtn">보내기</button>
-    </div>
-</div>
-</body>
+    </script>
 </html>

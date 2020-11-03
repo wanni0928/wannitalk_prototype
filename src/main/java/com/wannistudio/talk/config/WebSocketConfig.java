@@ -1,8 +1,7 @@
 package com.wannistudio.talk.config;
 
-import com.wannistudio.talk.handler.SocketHandler;
+import com.wannistudio.talk.handler.WebSocketHandler;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
@@ -12,12 +11,10 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 @EnableWebSocket
 @RequiredArgsConstructor
 public class WebSocketConfig implements WebSocketConfigurer {
-
-    @Autowired
-    private final SocketHandler socketHandler;
+    private final WebSocketHandler webSocketHandler;
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(socketHandler, "/chatting/{roomNumber}");
+        registry.addHandler(webSocketHandler, "/chat");
     }
 }
