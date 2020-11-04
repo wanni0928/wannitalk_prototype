@@ -15,6 +15,7 @@ public class GreetController {
 
 //    @MessageMapping("/hello")
 ////    @SendTo("/topic/greetings")
+//
 //    public void greeting(HelloMessage message) throws Exception {
 //        Thread.sleep(1000); // simulated delay
 //        System.out.println(message);
@@ -28,7 +29,11 @@ public class GreetController {
 //    }
     @MessageMapping("/hello")
     public void greeting(HelloMessage helloMessage) throws Exception {
-
         messageTemplate.convertAndSend("/topic/greetings", helloMessage.getName());
+    }
+
+    @MessageMapping("/bye")
+    public void gret(HelloMessage helloMessage) {
+        messageTemplate.convertAndSend("/topic/greetings", helloMessage.getName() + " bye");
     }
 }

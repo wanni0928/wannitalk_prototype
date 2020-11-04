@@ -9,7 +9,6 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
 @RequiredArgsConstructor
@@ -34,12 +33,5 @@ public class ChatMessageController {
         Member member = memberService.findOne(11L);
         model.addAttribute("member", member);
         return "chat/main";
-    }
-
-    @PostMapping("/send")
-    public String sendData(String name, Model model){
-        Object name1 = model.getAttribute("name");
-        System.out.println(name1.toString());
-        return "success";
     }
 }
