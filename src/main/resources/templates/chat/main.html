@@ -15,6 +15,7 @@
         <fieldset>
             <input type="text" id=name name="name" placeholder="input message...">
             <button id = jsSend type="submit">send</button>
+            <button id = jsSend2 type="submit">send</button>
         </fieldset>
     </form>
 
@@ -51,11 +52,20 @@
         document.getElementById("jsSend").addEventListener("click", () => {
             sendMsg();
         });
+        document.getElementById("jsSend2").addEventListener("click", () => {
+            sendMsg2();
+        });
         const sendMsg = () => {
             let name = {
                 "name" : `${document.getElementById("name").value}`
             };
             stompClient.send("/app/hello", {}, JSON.stringify(name));
+        };
+        const sendMsg2 = () => {
+            let name = {
+                "name" : `${document.getElementById("name").value}`
+            };
+            stompClient.send("/app/bye", {}, JSON.stringify(name));
         };
 
         
