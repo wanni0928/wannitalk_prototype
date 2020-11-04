@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.0/sockjs.min.js" integrity="sha512-5yJ548VSnLflcRxWNqVWYeQZnby8D8fJTmYRLyvs445j1XmzR8cnWi85lcHx3CUEeAX+GrK3TqTfzOO6LKDpdw==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js" integrity="sha512-iKDtgDyTHjAitUDdLljGhenhPwrbBfqTKWO1mkhSFH3A7blITC9MhYon6SjnMhp4o0rADGw9yAC6EW4t5a4K3g==" crossorigin="anonymous"></script>
+</head>
+<body>
+    <ul id="jsMsgList">
+
+    </ul>
+    <form method="POST" id="jsForm">
+        <fieldset>
+            <input type="text" id=name name="name" placeholder="input message...">
+            <button id = jsSend type="submit">send</button>
+        </fieldset>
+    </form>
+
+    <script>
+        let stompClient;
+        /*<![CDATA[*/
+
+        // let member = {
+        //     "id" : [[${member.id}]],
+        //     "email" : "[[${member.email}]]",
+        //     "name" : "[[${member.name}]]"
+        // };
+
+        /*]]>*/
+        const connect = () => {
+            let socket = new SockJS('/gs-guide-websocket');
+            stompClient = Stomp.over(socket);
+            stompClient.connect({}, (frame) => {
+                console.log('Connected: ' + frame);
+                stompClient.subscribe('/topic/greetings', (e) => {
+                    const li = document.createElement("li");
+                    li.innerText = e.body;
+                    document.getElementById("jsMsgList").appendChild(li);
+                });
+            });
+        };
+
+        connect();
+
+        document.getElementById("jsForm").addEventListener("submit", (e) => {
+            e.preventDefault();
+            document.getElementById("name").value = "";
+        });
+        document.getElementById("jsSend").addEventListener("click", () => {
+            sendMsg();
+        });
+        const sendMsg = () => {
+            let name = {
+                "name" : `${document.getElementById("name").value}`
+            };
+            stompClient.send("/app/hello", {}, JSON.stringify(name));
+        };
+
+        
+    </script>
+</body>
+</html>

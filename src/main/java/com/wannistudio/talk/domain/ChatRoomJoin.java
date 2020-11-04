@@ -5,17 +5,19 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter @Setter
 @NoArgsConstructor
-public class ChatRoom {
+public class ChatRoomJoin {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "room_id")
     private Long id;
 
-    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL)
-    private List<ChatMessage> messages = new ArrayList<>();
+    @ManyToOne
+    @JoinColumn(name =  "member_id")
+    private Member member;
+
+    @ManyToOne
+    @JoinColumn(name = "room_id")
+    private ChatRoom chatRoom;
 }

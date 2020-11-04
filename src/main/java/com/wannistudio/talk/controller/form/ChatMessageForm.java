@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Getter @Setter
-public class ChatRoomForm {
+public class ChatMessageForm {
     private String name;
+    private String sender;
+    private String message;
 }
