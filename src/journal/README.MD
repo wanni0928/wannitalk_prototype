@@ -45,11 +45,11 @@
             private final SimpMessageSendingOperations messageTemplate;
             
             /* 기본적인 방법 -1- */
-            @MessageMapping("/hello")
-            @SendTo("/topic/greetings")
+            @MessageMapping("/hello") // 클라이언트단에선 app/hello 로 전달을 했지만 자바에선 WebSocketConfig destinationPrefix로 "/app" 을 등록했지 때문에, "/hello"만 써도 충분히 전달이 된다.
+            @SendTo("/topic/greetings") // StompClient 에서 지정한 url 중 '/topic/greetings'  
             public void greeting(HelloMessage message) throws Exception {
                 Thread.sleep(1000); // simulated delay      
-                return new Greeting("Hello, " + HtmlUtils.htmlEscape(message.getName()) + "!");
+                return new Greeting("Hello, " + HtmlUtils.htmlEscape(message.getName()) + "!"); // 클라이언트단에서 receive한 데이터를 정리해서, @SendTo('StompClient.subscriber') 한다.
             }
             
             /* @SendTo 대신에 SimpMessageSendingOperations 를 활용한 방법  -2- */
@@ -108,9 +108,10 @@
                     stompClient.connect({}, (frame) => {
                         console.log('Connected: ' + frame);
                         stompClient.subscribe('/topic/greetings', (e) => {
+                          // controller에서 정제되어 전달된 데이터를 subscribe 한다.
                             const li = document.createElement("li");
                             li.innerText = e.body;
-                            document.getElementById("jsMsgList").appendChild(li);
+                            document.getElementById("jsMsgList").appendChild(li); 
                         });
                     });
                 };
@@ -131,7 +132,7 @@
                     let name = {
                         "name" : `${document.getElementById("name").value}`
                     };
-                    stompClient.send("/app/hello", {}, JSON.stringify(name));
+                    stompClient.send("/app/hello", {}, JSON.stringify(name)); // 스프링의 controller 단으로 넘어간다.(controller는 'JSON.stringify(name)'의 데이터를 receive 한다.)
                 };
                 const sendMsg2 = () => {
                     let name = {
